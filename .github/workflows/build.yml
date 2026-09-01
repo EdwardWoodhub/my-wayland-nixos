@@ -1,1 +1,80 @@
-123
+name: Build NixOS and Sync to ACR
+
+on:
+  # 1. 每天北京时间 03:33 (UTC 19:33) 定时执行
+  schedule:
+    - cron: '33 19 * * *'
+
+  # 2. 仅当 main 分支有代码 push 时触发
+  push:
+    branches:
+      - main
+
+  # 3. 支持在 GitHub 网页上手动点击运行
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write # 允许向 GitHub Container Registry (GHCR) 推送镜像
+
+env:
+  NIX_CHANNEL: nixos-26.05
+
+jobs:
+  build-and-sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 1. 安装 Nix 工具链并显式绑定 nixpkgs 路径
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+        with:
+          nix_path: nixpkgs=channel:${{ env.NIX_CHANNEL }}
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      # 2. 构建多层系统镜像 tar 包
+      - name: Build Layered Docker Image
+        run: |
+          nix-build image.nix -o result
+
+      # 3. 登录 GHCR
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # 4. 加载并推送到 GHCR
+      - name: Push to GHCR
+        run: |
+          docker load < result
+
+          REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          GHCR_IMAGE="ghcr.io/${REPO_OWNER}/my-x11-nixos-vm:latest"
+
+          docker tag my-x11-nixos-vm:latest "$GHCR_IMAGE"
+          echo ">>> 正在推送到 GHCR: $GHCR_IMAGE"
+          docker push "$GHCR_IMAGE"
+
+      # 5. 安装 Skopeo 并同步到阿里云 ACR
+      - name: Sync Image from GHCR to Aliyun ACR using Skopeo
+        run: |
+          sudo apt-get update && sudo apt-get install -y skopeo
+
+          REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          SRC_IMAGE="docker://ghcr.io/${REPO_OWNER}/my-x11-nixos-vm:latest"
+          DEST_IMAGE="docker://${{ secrets.ALIYUN_ACR_REGISTRY }}/edwardwoodhub/my-x11-nixos-vm:latest"
+          
+
+          echo ">>> 正在使用 Skopeo 同步镜像到阿里云 ACR..."
+          skopeo copy \
+            --src-creds="${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" \
+            --dest-creds="${{ secrets.ALIYUN_ACR_USERNAME }}:${{ secrets.ALIYUN_ACR_PASSWORD }}" \
+            "$SRC_IMAGE" "$DEST_IMAGE"
+
+          echo ">>> 同步完成！"
