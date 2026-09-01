@@ -69,9 +69,12 @@
   xdg.portal = {
     enable = true;
     extraPortals = with pkgs; [
+      xdg-desktop-portal-wlr
+      xdg-desktop-portal-lxqt      
       xdg-desktop-portal-gtk
       xdg-desktop-portal
     ];
+    config.common.default = [ "wlr" "gtk" ];
   };
 
 ##############################Hardware Services#############################
@@ -100,10 +103,19 @@
 # You can disable this if you're only using the Wayland session.
   services.xserver.enable = true;
 
+  programs.labwc.enable = true;
+
 # Enable the KDE Plasma Desktop Environment.
 # services.displayManager.sddm.enable = true;
+# 显示管理器建议使用 SDDM（支持 Wayland）
+  services.displayManager.sddm = {
+    enable = true;
+    wayland.enable = true;
+  };
 # services.desktopManager.plasma6.enable = true;
-  services.displayManager.defaultSession = "xfce";
+# services.displayManager.defaultSession = "xfce";
+# services.displayManager.defaultSession = "labwc";
+  services.displayManager.defaultSession = "lxqt-wayland"; # 或在 SDDM 登录界面选择 labwc / LXQt (Wayland)
 
   services.xserver.xkb = {
     layout = "us";
@@ -113,10 +125,19 @@
 # Configure keymap in X11
   services.xserver.desktopManager = {
     xterm.enable = false;
-    xfce.enable = true;
+#   xfce.enable = true;
+    lxqt.enable = true;
   };
 
   environment.sessionVariables = {
+    # 强制让 Qt / GTK / Electron 应用优先运行在 Wayland 原生模式下
+    NIXOS_OZONE_WL = "1";
+    QT_QPA_PLATFORM = "wayland;xcb";
+    GDK_BACKEND = "wayland,x11,*";
+    SDL_VIDEODRIVER = "wayland";
+    CLUTTER_BACKEND = "wayland";
+
+    # 保留原有的输入法变量
     GTK_IM_MODULE   = "ibus";
     QT_IM_MODULE    = "ibus";
     XMODIFIERS      = "@im=ibus";
@@ -192,6 +213,24 @@
 # List packages installed in system profile. To search, run:
 # $ nix search wget
   environment.systemPackages = with pkgs; [
+    # 核心组件
+    labwc
+    lxqt.lxqt-session
+    lxqt.lxqt-wayland-session  
+    lxqt.lxqt-panel
+    lxqt.screengrab   
+    lxqt.qterminal  
+    lxqt.lxqt-config  
+    lxqt.lxqt-themes  
+    lxqt.lxqt-policykit  
+    lxqt.lxqt-notificationd  
+    lxqt.xdg-desktop-portal-lxqt  
+    # Wayland 常用外围工具
+    wl-clipboard
+    grim
+    slurp
+    waybar       # 可选：如果不用 lxqt-panel
+    wlr-randr    # Wayland 显示器设置工具
     kdePackages.discover   
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
