@@ -17,7 +17,7 @@ let
   };
 in
 pkgs.dockerTools.buildLayeredImage {
-  name = "my-x11-nixos-vm";
+  name = "my-wayland-nixos-vm";
   tag = "latest";
 
   # 最多切分 100 层，最大化复用基础库和未变动组件
