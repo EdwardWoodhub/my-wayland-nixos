@@ -117,8 +117,8 @@
   };
 # services.desktopManager.plasma6.enable = true;
 # services.displayManager.defaultSession = "xfce";
-# services.displayManager.defaultSession = "labwc";
-  services.displayManager.defaultSession = "lxqt-wayland"; # 或在 SDDM 登录界面选择 labwc / LXQt (Wayland)
+  services.displayManager.defaultSession = "labwc";
+# services.displayManager.defaultSession = "lxqt-wayland"; # 或在 SDDM 登录界面选择 labwc / LXQt (Wayland)
 
   services.xserver.xkb = {
     layout = "us";
