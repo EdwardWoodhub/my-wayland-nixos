@@ -227,7 +227,8 @@
     lxqt.lxqt-themes  
     lxqt.lxqt-policykit  
     lxqt.lxqt-notificationd  
-    lxqt.xdg-desktop-portal-lxqt  
+    lxqt.xdg-desktop-portal-lxqt 
+    xscreensaver
     # Wayland 常用外围工具
     wl-clipboard
     grim
