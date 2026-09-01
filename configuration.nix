@@ -69,13 +69,16 @@
   xdg.portal = {
     enable = true;
     extraPortals = with pkgs; [
-      xdg-desktop-portal-wlr
-      xdg-desktop-portal-lxqt      
+#     xdg-desktop-portal-wlr
+#     xdg-desktop-portal-lxqt      
       xdg-desktop-portal-gtk
       xdg-desktop-portal
     ];
     config.common.default = [ "wlr" "gtk" ];
   };
+
+  xdg.portal.lxqt.enable = true;
+  xdg.portal.wlr.enable = true;
 
 ##############################Hardware Services#############################
   virtualisation.vmware.guest.enable = true;
