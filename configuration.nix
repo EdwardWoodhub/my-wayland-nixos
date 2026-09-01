@@ -115,6 +115,11 @@
     enable = true;
     wayland.enable = true;
   };
+# ★ 关键修复：显式注册 Wayland 会话包
+  services.displayManager.sessionPackages = [
+    pkgs.labwc
+    pkgs.lxqt.lxqt-wayland-session
+  ];
 # services.desktopManager.plasma6.enable = true;
 # services.displayManager.defaultSession = "xfce";
   services.displayManager.defaultSession = "labwc";
