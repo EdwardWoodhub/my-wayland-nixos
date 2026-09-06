@@ -221,6 +221,7 @@
 # List packages installed in system profile. To search, run:
 # $ nix search wget
   environment.systemPackages = with pkgs; [
+    btop
     # 核心组件
     labwc
     lxqt.lxqt-session
@@ -254,9 +255,10 @@
     perl
     mate.pluma
     firefox
-    git
 #   fcitx5
 #   fcitx5-configtool
+    git
+    htop
     ibus
     ibus-with-plugins
     ibus-engines.rime
