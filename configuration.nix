@@ -222,60 +222,60 @@
 # $ nix search wget
   environment.systemPackages = with pkgs; [
     btop
-    # 核心组件
-    labwc
-    lxqt.lxqt-session
-    lxqt.lxqt-wayland-session  
-    lxqt.lxqt-panel
-    lxqt.screengrab   
-    lxqt.qterminal  
-    lxqt.lxqt-config  
-    lxqt.lxqt-themes  
-    lxqt.lxqt-policykit  
-    lxqt.lxqt-notificationd  
-    lxqt.xdg-desktop-portal-lxqt 
-    xscreensaver
-    # Wayland 常用外围工具
-    wl-clipboard
-    grim
-    slurp
-    waybar       # 可选：如果不用 lxqt-panel
-    wlr-randr    # Wayland 显示器设置工具
-    kdePackages.discover   
-    vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-    wget
     curl
-#   open-vm-tools
-#   open-vm-tools-headless
-    xorg.xf86inputvmmouse
-    samba
-#   libsForQt5.kdenetwork-filesharing
-    kdePackages.kdenetwork-filesharing
-    fuse
-    perl
-    mate.pluma
+    fastfetch
     firefox
-#   fcitx5
-#   fcitx5-configtool
+    flameshot
+    fuse
+    gedit
     git
+    google-chrome
+    grim
     htop
     ibus
-    ibus-with-plugins
-    ibus-engines.rime
     ibus-engines.libpinyin
-#   neofetch
-    fastfetch
-    google-chrome
-    gedit
-    trojan-go
-    v2raya
-    v2ray
-    xray
-#   proxychains-ng
-    podman
-    flameshot
+    ibus-engines.rime
+    ibus-with-plugins
+    kdePackages.discover   
+    kdePackages.kdenetwork-filesharing
+    labwc
+    lxqt.lxqt-config  
+    lxqt.lxqt-notificationd  
+    lxqt.lxqt-panel
+    lxqt.lxqt-policykit  
+    lxqt.lxqt-session
+    lxqt.lxqt-themes  
+    lxqt.lxqt-wayland-session  
+    lxqt.qterminal  
+    lxqt.screengrab   
+    lxqt.xdg-desktop-portal-lxqt 
+    mate.pluma
     meld   
+    perl
+    podman
+    samba
+    slurp
+    trojan-go
+    v2ray
+    v2raya
+    vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     vscode
+    waybar       # 可选：如果不用 lxqt-panel
+    wget
+    wl-clipboard
+    wlr-randr    # Wayland 显示器设置工具
+    xorg.xf86inputvmmouse
+    xray
+    xscreensaver
+#   fcitx5
+#   fcitx5-configtool
+#   libsForQt5.kdenetwork-filesharing
+#   neofetch
+#   open-vm-tools
+#   open-vm-tools-headless
+#   proxychains-ng
+
+
 
   ];
 
