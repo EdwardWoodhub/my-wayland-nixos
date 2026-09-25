@@ -1,4 +1,4 @@
-name: Build NixOS and Sync to ACR
+name: Build LXQt OS With Nix
 
 on:
   # 1. 每天北京时间 03:38 (UTC 19:38) 定时执行
