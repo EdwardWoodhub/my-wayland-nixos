@@ -9,6 +9,9 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - "**.md"
+    
 
   # 3. 支持在 GitHub 网页上手动点击运行
   workflow_dispatch:
