@@ -71,20 +71,14 @@ jobs:
           RELEASE_TAG="v$(date +'%Y%m%d%H%M%S')"
           echo "tag=${RELEASE_TAG}" >> $GITHUB_OUTPUT
 
-      # 7. 打包成 LiveCD ISO（基于刚推送到 GHCR 的容器镜像）
-      - name: Generate LiveCD ISO
+      # 7. 原生构建 NixOS LiveISO
+      - name: Build NixOS LiveISO
         run: |
-          REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
-          GHCR_IMAGE="ghcr.io/${REPO_OWNER}/my-wayland-nixos-vm:latest"
+          nix-build iso.nix -o iso-result
+          # 提取生成的 iso 文件并重命名
+          cp iso-result/iso/*.iso my-wayland-nixos-vm.iso
 
-          docker run --rm -v $(pwd):/workspace -w /workspace --privileged \
-            "$GHCR_IMAGE" \
-            elemental build-iso \
-            "$GHCR_IMAGE" \
-            -o . \
-            -n my-wayland-nixos-vm
-
-      # 8. 将生成的 ISO 切割为分卷（单卷 1.5GB，防止超出 GitHub Release 上传限制）
+      # 8. 切割为 1.5GB 分卷（避免超过单文件限制）
       - name: Split ISO
         run: |
           split -b 1500M my-wayland-nixos-vm.iso my-wayland-nixos-vm.iso.part-
@@ -97,6 +91,9 @@ jobs:
           tag_name: ${{ steps.vars.outputs.tag }}
           name: "LiveISO Release ${{ steps.vars.outputs.tag }}"
           generate_release_notes: true
+
+          
+     
       
       # 5. 安装 Skopeo 并同步到阿里云 ACR
       - name: Sync Image from GHCR to Aliyun ACR using Skopeo
