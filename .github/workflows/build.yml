@@ -17,7 +17,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write # 允许创建并上传资产到 GitHub Releases
   packages: write # 允许向 GitHub Container Registry (GHCR) 推送镜像
 
 env:
@@ -64,6 +64,40 @@ jobs:
           echo ">>> 正在推送到 GHCR: $GHCR_IMAGE"
           docker push "$GHCR_IMAGE"
 
+      # 6. 生成发布标签与版本号
+      - name: Set Release Tag
+        id: vars
+        run: |
+          RELEASE_TAG="v$(date +'%Y%m%d%H%M%S')"
+          echo "tag=${RELEASE_TAG}" >> $GITHUB_OUTPUT
+
+      # 7. 打包成 LiveCD ISO（基于刚推送到 GHCR 的容器镜像）
+      - name: Generate LiveCD ISO
+        run: |
+          REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          GHCR_IMAGE="ghcr.io/${REPO_OWNER}/my-wayland-nixos-vm:latest"
+
+          docker run --rm -v $(pwd):/workspace -w /workspace --privileged \
+            "$GHCR_IMAGE" \
+            elemental build-iso \
+            "$GHCR_IMAGE" \
+            -o . \
+            -n my-wayland-nixos-vm
+
+      # 8. 将生成的 ISO 切割为分卷（单卷 1.5GB，防止超出 GitHub Release 上传限制）
+      - name: Split ISO
+        run: |
+          split -b 1500M my-wayland-nixos-vm.iso my-wayland-nixos-vm.iso.part-
+
+      # 9. 发布切片后的 ISO 到 GitHub Releases
+      - name: Publish ISO to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          files: my-wayland-nixos-vm.iso.part-*
+          tag_name: ${{ steps.vars.outputs.tag }}
+          name: "LiveISO Release ${{ steps.vars.outputs.tag }}"
+          generate_release_notes: true
+      
       # 5. 安装 Skopeo 并同步到阿里云 ACR
       - name: Sync Image from GHCR to Aliyun ACR using Skopeo
         run: |
