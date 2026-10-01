@@ -238,6 +238,7 @@
     ibus-with-plugins
     kdePackages.discover   
     kdePackages.kdenetwork-filesharing
+    kdePackages.konsole
     labwc
     lxqt.lxqt-config  
     lxqt.lxqt-notificationd  
