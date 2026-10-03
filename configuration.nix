@@ -256,6 +256,7 @@
     podman
     samba
     slurp
+    tilix
     trojan-go
     v2ray
     v2raya
